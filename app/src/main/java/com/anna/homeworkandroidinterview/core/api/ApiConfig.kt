@@ -1,4 +1,4 @@
-package com.anna.homeworkandroidinterview.api
+package com.anna.homeworkandroidinterview.core.api
 
 object ApiConfig {
 

@@ -1,6 +1,5 @@
-package com.anna.homeworkandroidinterview.api
+package com.anna.homeworkandroidinterview.core.api
 
-import androidx.core.os.BuildCompat
 import androidx.viewbinding.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,8 +9,7 @@ import java.util.concurrent.TimeUnit
 
 class NetworkService {
 
-    val apiService: ImageApiService // TODO 為什麼是這樣寫
-
+    val apiService: ImageApiService
 
     init {
         val retrofit = with(Retrofit.Builder()) {
@@ -20,16 +18,16 @@ class NetworkService {
             client(initOKHttpClient())
             build()
         }
-        apiService = retrofit.create(ImageApiService::class.java)  // TODO apply return this 不認得
+        apiService = retrofit.create(ImageApiService::class.java)
     }
 
 
     private fun initOKHttpClient(): OkHttpClient {
 
-        val client = OkHttpClient().newBuilder().apply {
-            this.connectTimeout(ApiConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS)
-            this.readTimeout(ApiConfig.READ_TIMEOUT, TimeUnit.SECONDS)
-            this.callTimeout(ApiConfig.CALL_TIMEOUT, TimeUnit.SECONDS)
+        val client = with(OkHttpClient().newBuilder()){
+            connectTimeout(ApiConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            readTimeout(ApiConfig.READ_TIMEOUT, TimeUnit.SECONDS)
+            callTimeout(ApiConfig.CALL_TIMEOUT, TimeUnit.SECONDS)
         }
 
         // 印Log

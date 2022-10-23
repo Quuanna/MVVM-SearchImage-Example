@@ -1,4 +1,4 @@
-package com.anna.homeworkandroidinterview
+package com.anna.homeworkandroidinterview.ui.main
 
 import android.annotation.SuppressLint
 import android.app.SearchManager
@@ -17,10 +17,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.anna.homeworkandroidinterview.adapter.ImageRecycleViewAdapter
-import com.anna.homeworkandroidinterview.data.CardsType
+import com.anna.homeworkandroidinterview.R
+import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
+import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.databinding.ActivityMainBinding
+import com.anna.homeworkandroidinterview.ui.searchSuggest.MySuggestionProvider
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +36,6 @@ class MainActivity : AppCompatActivity() {
     private val queryTextListener = OnQueryTextListener()
     private val suggestionListener = OnSuggestionListener()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -42,8 +43,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.topAppBar)
 
         initTopAppBar()
-        apiResponseObservers()
-        clearSearchHistory()
+        initObservers()
     }
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         val searchItem = menu.findItem(R.id.menu_search)
         searchView = searchItem.actionView as SearchView
 
+        clearSearchHistory()
         //將可搜尋配置與SearchView關聯
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         searchView?.apply {
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
             setOnQueryTextListener(queryTextListener)
             // 監聽歷史紀錄搜尋
             setOnSuggestionListener(suggestionListener)
+            isSubmitButtonEnabled = true
         }
         return true
     }
@@ -74,9 +76,9 @@ class MainActivity : AppCompatActivity() {
     /**
      *  註冊 LiveData 觀察者
      */
-    private fun apiResponseObservers() {
+    private fun initObservers() {
         // response Success
-        mViewModel.getImagesList.observe(this@MainActivity) { lists ->
+        mViewModel.getResponseImagesList.observe(this@MainActivity) { lists ->
             imageViewDataList = lists.dataList
             setViewLayout(binding.topAppBar.menu.findItem(R.id.menu_switch))
         }
@@ -104,31 +106,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * SearchRecentSuggestions
-     * doSearchSave - 儲存用戶最近查詢
-     * clearSearchHistory - 清除建議資料
-     */
-    private fun searchHandleIntent(intent: Intent) {
-        //Get Intent，驗證操作並獲取查詢
-        if (Intent.ACTION_SEARCH == intent.action) {
-            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
-                doSearchSave(query)
-
-            }
-        }
-    }
-    private fun doSearchSave(query: String) {
-        Log.d("search", "4 - saveRecentQuery ")
-        SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
-            .saveRecentQuery(query, null) // 參數1是搜尋查詢字串、參數2有啟用兩行模式時使用，相反則帶入null
-    }
-    private fun clearSearchHistory() {
-        SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
-            .clearHistory()
-    }
-
-
-    /**
      * 初始化設定RecycleView顯示方式
      * Params - dataList是API成功後回傳的資料
      *        - type是Layout呈現類型（列表、網格）
@@ -137,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         imageViewDataList: List<SearchImageResponseData.Info?>,
         type: CardsType
     ) {
-        binding.recyclerView.adapter = ImageRecycleViewAdapter(imageViewDataList, CardsType.GRID)
+        binding.recyclerView.adapter = ImageRecycleViewAdapter(imageViewDataList)
         when (type) {
             CardsType.GRID -> {
                 binding.recyclerView.layoutManager =
@@ -149,7 +126,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun setViewLayout(menu: MenuItem) {
         when (menu.title) {
             getString(R.string.menu_item_switch_grid) -> {
@@ -164,6 +140,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    /**
+     * SearchRecentSuggestions
+     * doSearchSave - 儲存用戶最近查詢
+     * clearSearchHistory - 清除建議資料
+     */
+    private fun searchHandleIntent(intent: Intent) {
+        //Get Intent，驗證操作並獲取查詢
+        if (Intent.ACTION_SEARCH == intent.action) {
+            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
+                doSearchSave(query)
+            }
+        }
+    }
+    private fun doSearchSave(query: String) {
+        SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
+            .saveRecentQuery(query, null) // 參數1是搜尋查詢字串、參數2有啟用兩行模式時使用，相反則帶入null
+    }
+    private fun clearSearchHistory() {
+        SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
+            .clearHistory()
+    }
+
     /**
      *  訊息視窗
      */

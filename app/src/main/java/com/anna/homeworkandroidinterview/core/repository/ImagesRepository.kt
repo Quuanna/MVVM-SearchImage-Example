@@ -1,7 +1,7 @@
-package com.anna.homeworkandroidinterview.data.model.repository
+package com.anna.homeworkandroidinterview.core.repository
 
-import com.anna.homeworkandroidinterview.api.ApiConfig
-import com.anna.homeworkandroidinterview.api.NetworkService
+import com.anna.homeworkandroidinterview.core.api.ApiConfig
+import com.anna.homeworkandroidinterview.core.api.NetworkService
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

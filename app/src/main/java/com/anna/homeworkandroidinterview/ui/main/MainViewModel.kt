@@ -1,21 +1,12 @@
-package com.anna.homeworkandroidinterview
+package com.anna.homeworkandroidinterview.ui.main
 
-import android.accounts.NetworkErrorException
-import android.util.Log
 import androidx.lifecycle.*
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.anna.homeworkandroidinterview.data.model.repository.ImagesRepository
+import com.anna.homeworkandroidinterview.core.repository.ImagesRepository
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.net.SocketTimeoutException
-import javax.net.ssl.SSLException
 
 class MainViewModel : ViewModel() {
 
@@ -24,7 +15,7 @@ class MainViewModel : ViewModel() {
         get() = mIsLoadRequest
 
     // response
-    val getImagesList: LiveData<SearchImageResponseData>
+    val getResponseImagesList: LiveData<SearchImageResponseData>
         get() = mImagesList
 
     // 搜不到資料
@@ -43,16 +34,15 @@ class MainViewModel : ViewModel() {
     // private Repository
     private val imagesRepository = ImagesRepository()
 
-
     // 執行異步操作來獲取圖片
-    fun callApiResponseData(keywords: String) {
+    fun callApiResponseData(keyword: String) {
         showLoading(true)
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
             // error
             showLoading(false)
             mResponseError.postValue("${throwable.cause}+\n+${throwable.message}")
         }) {
-            imagesRepository.getApiResponse(keywords).onCompletion {
+            imagesRepository.getApiResponse(keyword).onCompletion {
                 // 完成
                 showLoading(false)
             }.collect {
@@ -66,10 +56,6 @@ class MainViewModel : ViewModel() {
         }
     }
 
-
-    /**
-     * private fun
-     */
     private fun showLoading(isLoad: Boolean) {
         mIsLoadRequest.postValue(isLoad)
     }

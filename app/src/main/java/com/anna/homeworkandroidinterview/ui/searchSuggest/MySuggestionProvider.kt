@@ -1,4 +1,4 @@
-package com.anna.homeworkandroidinterview
+package com.anna.homeworkandroidinterview.ui.searchSuggest
 
 import android.content.SearchRecentSuggestionsProvider
 
@@ -9,7 +9,7 @@ class MySuggestionProvider : SearchRecentSuggestionsProvider() {
     }
 
     companion object {
-        const val AUTHORITY = "com.anna.homeworkandroidinterview.MySuggestionProvider"
+        const val AUTHORITY = "com.anna.homeworkandroidinterview.ui.searchSuggest.MySuggestionProvider"
         const val MODE: Int = DATABASE_MODE_QUERIES
     }
 }
