@@ -10,4 +10,5 @@
     <string name="dialog_positive_button">確定</string>
     <string name="dialog_not_found_message">查無資料，請重新搜尋</string>
 
+    <string name="search_hint">可搜尋圖片</string>
 </resources>
