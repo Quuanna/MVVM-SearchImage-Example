@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.12979616306954436" />
+        <entry key="../../.gradle/caches/transforms-3/d3b5a00c8c8d32cf7dccb8ee585ed284/transformed/appcompat-1.5.1/res/drawable/abc_ic_clear_material.xml" value="0.2165" />
+        <entry key="../../.gradle/caches/transforms-3/d3b5a00c8c8d32cf7dccb8ee585ed284/transformed/appcompat-1.5.1/res/drawable/abc_ic_go_search_api_material.xml" value="0.2165" />
+        <entry key="../../.gradle/caches/transforms-3/d3b5a00c8c8d32cf7dccb8ee585ed284/transformed/appcompat-1.5.1/res/drawable/abc_ic_search_api_material.xml" value="0.2165" />
+        <entry key="../../.gradle/caches/transforms-3/d3b5a00c8c8d32cf7dccb8ee585ed284/transformed/appcompat-1.5.1/res/drawable/abc_ic_voice_search_api_material.xml" value="0.166" />
+        <entry key="../../.gradle/caches/transforms-3/d3b5a00c8c8d32cf7dccb8ee585ed284/transformed/appcompat-1.5.1/res/drawable/abc_textfield_search_material.xml" value="0.2165" />
+        <entry key="../../.gradle/caches/transforms-3/d3b5a00c8c8d32cf7dccb8ee585ed284/transformed/appcompat-1.5.1/res/layout/abc_search_view.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/drawable-v24/ic_search.xml" value="0.1955" />
+        <entry key="app/src/main/res/drawable/ic_baseline_grid_view.xml" value="0.166" />
+        <entry key="app/src/main/res/drawable/ic_baseline_list_view.xml" value="0.113" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2485" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2682291666666667" />
+        <entry key="app/src/main/res/layout/item_cards_grid.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/item_cards_vertical.xml" value="0.32691802978515627" />
+        <entry key="app/src/main/res/menu/top_app_bar.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

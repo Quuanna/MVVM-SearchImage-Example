@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">HomeworkAndroidInterview</string>
+
+    <string name="page_title">頁面</string>
+    <string name="menu_item_search">搜尋</string>
+    <string name="menu_item_switch_grid">網格呈現</string>
+    <string name="menu_item_switch_list">列表呈現</string>
+
+    <string name="dialog_title">提示訊息</string>
+    <string name="dialog_positive_button">確定</string>
+    <string name="dialog_not_found_message">查無資料，請重新搜尋</string>
+
+</resources>
