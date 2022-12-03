@@ -9,7 +9,14 @@ import java.util.concurrent.TimeUnit
 
 class NetworkService {
 
-    val apiService: ImageApiService
+    private val apiService: ImageApiService
+
+    companion object {
+        val mNetworkService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+            NetworkService().apiService
+        }
+    }
+
 
     init {
         val retrofit = with(Retrofit.Builder()) {
