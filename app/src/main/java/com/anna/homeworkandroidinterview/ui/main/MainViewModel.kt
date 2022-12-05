@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val imagesRepository: ImagesRepository) : ViewModel() {
 
     // request
     val isLoadRequest: LiveData<Boolean>
@@ -31,8 +31,7 @@ class MainViewModel : ViewModel() {
     private val mImagesList = MutableLiveData<SearchImageResponseData>()
     private val mIsSearchNotFound = MutableLiveData<Boolean>()
     private val mResponseError = MutableLiveData<String>()
-    // private Repository
-    private val imagesRepository = ImagesRepository()
+
 
     // 執行異步操作來獲取圖片
     fun callApiResponseData(keyword: String) {

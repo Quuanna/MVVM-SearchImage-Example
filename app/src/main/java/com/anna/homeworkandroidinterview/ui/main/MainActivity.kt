@@ -7,7 +7,6 @@ import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.SearchRecentSuggestions
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -22,19 +21,22 @@ import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
 import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.databinding.ActivityMainBinding
+import com.anna.homeworkandroidinterview.ui.AnyViewModelFactory
 import com.anna.homeworkandroidinterview.ui.searchSuggest.MySuggestionProvider
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val mViewModel: MainViewModel by viewModels() // 透過委托屬性使用Kotlin，本質上是間在使用ViewModelProvider
-    private var imageViewDataList: List<SearchImageResponseData.Info?> = listOf()
+    private lateinit var factory: AnyViewModelFactory
+    private val mViewModel by viewModels<MainViewModel> { factory }// 透過委托屬性使用Kotlin，本質上是間在使用ViewModelProvider
 
-    private var searchView: SearchView? = null
-    private val menuItemClick = OnMenuItemClick()
-    private val queryTextListener = OnQueryTextListener()
-    private val suggestionListener = OnSuggestionListener()
+    private var mImageViewDataList: List<SearchImageResponseData.Info?> = listOf()
+
+    private var mSearchView: SearchView? = null
+    private val mMenuItemClick = OnMenuItemClick()
+    private val mQueryTextListener = OnQueryTextListener()
+    private val mSuggestionListener = OnSuggestionListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,41 +47,44 @@ class MainActivity : AppCompatActivity() {
         initTopAppBar()
         initObservers()
     }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         searchHandleIntent(intent)
     }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.options_menu, menu)
         val searchItem = menu.findItem(R.id.menu_search)
-        searchView = searchItem.actionView as SearchView
+        mSearchView = searchItem.actionView as SearchView
 
         clearSearchHistory()
         //將可搜尋配置與SearchView關聯
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        searchView?.apply {
+        mSearchView?.apply {
             // 呼叫getSearchableInfo()獲取從可搜尋配置XML檔案建立的SearchableInfo物件，
             setSearchableInfo(searchManager.getSearchableInfo(componentName))
             // 監聽輸入搜尋
-            setOnQueryTextListener(queryTextListener)
+            setOnQueryTextListener(mQueryTextListener)
             // 監聽歷史紀錄搜尋
-            setOnSuggestionListener(suggestionListener)
+            setOnSuggestionListener(mSuggestionListener)
             isSubmitButtonEnabled = true
         }
         return true
     }
 
     private fun initTopAppBar() {
-        binding.topAppBar.setOnMenuItemClickListener(menuItemClick)
+        binding.topAppBar.setOnMenuItemClickListener(mMenuItemClick)
     }
+
     /**
      *  註冊 LiveData 觀察者
      */
     private fun initObservers() {
         // response Success
         mViewModel.getResponseImagesList.observe(this@MainActivity) { lists ->
-            imageViewDataList = lists.dataList
+            mImageViewDataList = lists.dataList
             setViewLayout(binding.topAppBar.menu.findItem(R.id.menu_switch))
         }
 
@@ -126,17 +131,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun setViewLayout(menu: MenuItem) {
         when (menu.title) {
             getString(R.string.menu_item_switch_grid) -> {
                 menu.title = getString(R.string.menu_item_switch_grid)
                 menu.setIcon(R.drawable.ic_baseline_grid_view)
-                switchRecycleViewLayout(imageViewDataList, CardsType.VERTICAL)
+                switchRecycleViewLayout(mImageViewDataList, CardsType.VERTICAL)
             }
             getString(R.string.menu_item_switch_list) -> {
                 menu.title = getString(R.string.menu_item_switch_list)
                 menu.setIcon(R.drawable.ic_baseline_list_view)
-                switchRecycleViewLayout(imageViewDataList, CardsType.GRID)
+                switchRecycleViewLayout(mImageViewDataList, CardsType.GRID)
             }
         }
     }
@@ -154,10 +160,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun doSearchSave(query: String) {
         SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
             .saveRecentQuery(query, null) // 參數1是搜尋查詢字串、參數2有啟用兩行模式時使用，相反則帶入null
     }
+
     private fun clearSearchHistory() {
         SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
             .clearHistory()
@@ -193,6 +201,7 @@ class MainActivity : AppCompatActivity() {
             return true
         }
     }
+
     private inner class OnSuggestionListener : SearchView.OnSuggestionListener {
         override fun onSuggestionSelect(position: Int): Boolean {
             return false
@@ -200,14 +209,16 @@ class MainActivity : AppCompatActivity() {
 
         @SuppressLint("Range")
         override fun onSuggestionClick(position: Int): Boolean {
-            val cursor = searchView?.suggestionsAdapter?.getItem(position) as Cursor
+            val cursor = mSearchView?.suggestionsAdapter?.getItem(position) as Cursor
             val selection =
                 cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
-            searchView?.setQuery(selection, false)
+            mSearchView?.setQuery(selection, false)
             return true
         }
     }
-    private inner class OnMenuItemClick : androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {
+
+    private inner class OnMenuItemClick :
+        androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {
         override fun onMenuItemClick(menu: MenuItem?): Boolean {
             return when (menu?.itemId) {
                 R.id.menu_switch -> {
@@ -215,12 +226,12 @@ class MainActivity : AppCompatActivity() {
                         getString(R.string.menu_item_switch_grid) -> {
                             menu.title = getString(R.string.menu_item_switch_list)
                             menu.setIcon(R.drawable.ic_baseline_list_view)
-                            switchRecycleViewLayout(imageViewDataList, CardsType.GRID)
+                            switchRecycleViewLayout(mImageViewDataList, CardsType.GRID)
                         }
                         getString(R.string.menu_item_switch_list) -> {
                             menu.title = getString(R.string.menu_item_switch_grid)
                             menu.setIcon(R.drawable.ic_baseline_grid_view)
-                            switchRecycleViewLayout(imageViewDataList, CardsType.VERTICAL)
+                            switchRecycleViewLayout(mImageViewDataList, CardsType.VERTICAL)
                         }
                     }
                     true

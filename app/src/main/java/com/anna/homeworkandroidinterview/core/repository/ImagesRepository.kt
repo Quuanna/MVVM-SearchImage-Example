@@ -1,7 +1,6 @@
 package com.anna.homeworkandroidinterview.core.repository
 
 import com.anna.homeworkandroidinterview.core.api.ApiConfig
-import com.anna.homeworkandroidinterview.core.api.NetworkService
 import com.anna.homeworkandroidinterview.core.api.NetworkService.Companion.mNetworkService
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import kotlinx.coroutines.Dispatchers
