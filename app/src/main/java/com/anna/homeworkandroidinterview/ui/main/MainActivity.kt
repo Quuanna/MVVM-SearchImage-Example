@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anna.homeworkandroidinterview.R
+import com.anna.homeworkandroidinterview.core.api.NetworkService
+import com.anna.homeworkandroidinterview.core.repository.ImagesRepository
 import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
 import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
@@ -28,8 +30,11 @@ import com.anna.homeworkandroidinterview.ui.searchSuggest.MySuggestionProvider
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var factory: AnyViewModelFactory
-    private val mViewModel by viewModels<MainViewModel> { factory }// 透過委托屬性使用Kotlin，本質上是間在使用ViewModelProvider
+    private val mViewModel by viewModels<MainViewModel> {
+        AnyViewModelFactory{
+            MainViewModel(ImagesRepository(NetworkService))
+        }
+    }
 
     private var mImageViewDataList: List<SearchImageResponseData.Info?> = listOf()
 
