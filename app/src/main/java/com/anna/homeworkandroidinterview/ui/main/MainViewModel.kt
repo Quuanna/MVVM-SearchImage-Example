@@ -1,13 +1,9 @@
 package com.anna.homeworkandroidinterview.ui.main
 
 import androidx.lifecycle.*
-import com.anna.homeworkandroidinterview.core.repository.DataSourceListener
 import com.anna.homeworkandroidinterview.core.repository.ImagesRepository
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.ui.BaseViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val imagesRepository: ImagesRepository) : BaseViewModel() {
