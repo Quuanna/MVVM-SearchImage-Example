@@ -12,7 +12,7 @@ class NetworkService {
     private val apiService: ImageApiService
 
     companion object {
-        val mNetworkService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+        val service by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             NetworkService().apiService
         }
     }

@@ -1,6 +1,9 @@
 package com.anna.homeworkandroidinterview.ui.main
 
-import androidx.lifecycle.*
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.anna.homeworkandroidinterview.core.repository.ImagesRepository
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.ui.BaseViewModel
@@ -11,45 +14,39 @@ class MainViewModel(private val imagesRepository: ImagesRepository) : BaseViewMo
 
     // response
     val getResponseImagesList: LiveData<SearchImageResponseData>
-        get() = mImagesList
+        get() = setImagesList
 
     // 搜不到資料
     val isSearchNotFound: LiveData<Boolean>
-        get() = mIsSearchNotFound
+        get() = setIsSearchNotFound
 
 
     // private LiveData
-    private val mImagesList = MutableLiveData<SearchImageResponseData>()
-    private val mIsSearchNotFound = MutableLiveData<Boolean>()
+    private val setImagesList = MutableLiveData<SearchImageResponseData>()
+    private val setIsSearchNotFound = MutableLiveData<Boolean>()
 
 
+    fun searchNotFound(isNotFoundData: Boolean) {
+        setIsSearchNotFound.postValue(isNotFoundData)
+    }
 
     // 執行異步操作來獲取圖片
     fun callApiResponseData(keyword: String) {
         showLoading(true)
         viewModelScope.launch(handler) {
-            // Flow
-//            imagesRepository.getApiResponse(keyword).onCompletion {
-//                // 完成
-//                showLoading(false)
-//            }.collect {
-//                showLoading(false)
-//                if (it.dataList.isEmpty()) {
-//                    mIsSearchNotFound.postValue(true)
-//                } else {
-//                    mImagesList.postValue(it)
-//                }
-//            }
-
-            imagesRepository.getSearchImage(keyword){
+            imagesRepository.searchImage(
+                onStart = { showLoading(true) },
+                onCompletion = { showLoading(false) },
+                keyword
+            ).collect {
+                Log.d("TEST", "it.dataList = ${it.dataList.toList()}")
                 if (it.dataList.isEmpty()) {
-                    mIsSearchNotFound.postValue(true)
+                    searchNotFound(true)
                 } else {
-                    mImagesList.postValue(it)
+                    setImagesList.postValue(it)
                 }
             }
         }
     }
-
 }
 

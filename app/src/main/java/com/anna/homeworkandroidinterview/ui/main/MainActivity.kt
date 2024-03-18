@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anna.homeworkandroidinterview.R
 import com.anna.homeworkandroidinterview.core.api.NetworkService
-import com.anna.homeworkandroidinterview.core.repository.ImagesRepository
+import com.anna.homeworkandroidinterview.core.repository.ImagesRepositoryImp
 import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
 import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mViewModel by viewModels<MainViewModel> {
         AnyViewModelFactory{
-            MainViewModel(ImagesRepository(NetworkService))
+            MainViewModel(ImagesRepositoryImp(NetworkService))
         }
     }
 
