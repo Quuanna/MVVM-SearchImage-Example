@@ -19,7 +19,8 @@ import org.junit.runner.RunWith
 class MainViewModelTest {
     private lateinit var imagesRepository: ImagesRepository
     private lateinit var testViewModel: MainViewModel
-    private val networkService = NetworkService.Companion
+    private val networkService = NetworkService.Companion // TODO Add Mock NetworkService
+
     @Before
     fun initRepository() {
         imagesRepository = ImagesRepositoryImp(networkService)
@@ -31,22 +32,62 @@ class MainViewModelTest {
 
     @Test
     fun callApiResponseData_notNullValue() {
-        testViewModel.callApiResponseData("貓咪")  // When adding a new task
+        testViewModel.callApiResponseData("貓咪")  // TODO Add Mock API Response
         val value = testViewModel.getResponseImagesList.getOrAwaitValue()
-        MatcherAssert.assertThat("", value, not(nullValue()))
+        MatcherAssert.assertThat(value, not(nullValue()))
     }
 
     @Test
     fun searchNotFound_true() {
         testViewModel.searchNotFound(true)  // When adding a new task
         val value = testViewModel.isSearchNotFound.getOrAwaitValue()
-        MatcherAssert.assertThat("", value, `is`(true))
+        MatcherAssert.assertThat(value, `is`(true))
     }
 
     @Test
     fun searchNotFound_false() {
         testViewModel.searchNotFound(false)  // When adding a new task
         val value = testViewModel.isSearchNotFound.getOrAwaitValue()
-        MatcherAssert.assertThat("", value, `is`(false))
+        MatcherAssert.assertThat(value, `is`(false))
+    }
+
+    @Test
+    fun showResponseError_singleEvent() {
+        testViewModel.showHintMessageResponseError("SocketException", "exception.message")
+        val value = testViewModel.responseError.getOrAwaitValue()
+        MatcherAssert.assertThat(value.getContentIfNotHandled(), not(nullValue()))
+    }
+
+    @Test
+    fun singleEventShowResponseError_notNull() {
+        testViewModel.showHintMessageResponseError("SocketException", "exception.message")
+        val value = testViewModel.responseError.getOrAwaitValue()
+        MatcherAssert.assertThat(value, not(nullValue()))
+    }
+
+    @Test
+    fun showProgress_singleEvent() {
+        testViewModel.showLoading(true)
+        val value = testViewModel.isShowProgress.getOrAwaitValue()
+        MatcherAssert.assertThat(value.getContentIfNotHandled(), not(nullValue()))
+    }
+
+    @Test
+    fun singleEventShowProgress_true() {
+        testViewModel.showLoading(true)
+        val event = testViewModel.isShowProgress.getOrAwaitValue()
+        event.getContentIfNotHandled()?.let { value ->
+            MatcherAssert.assertThat(value, `is`(true))
+        }
+    }
+
+
+    @Test
+    fun singleEventShowProgress_false() {
+        testViewModel.showLoading(false)
+        val event = testViewModel.isShowProgress.getOrAwaitValue()
+        event.getContentIfNotHandled()?.let { value ->
+            MatcherAssert.assertThat(value, `is`(false))
+        }
     }
 }

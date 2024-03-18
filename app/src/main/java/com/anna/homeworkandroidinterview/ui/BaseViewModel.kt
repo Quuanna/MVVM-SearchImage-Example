@@ -3,25 +3,25 @@ package com.anna.homeworkandroidinterview.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.anna.homeworkandroidinterview.util.SingleEvent
 import kotlinx.coroutines.CoroutineExceptionHandler
 
 abstract class BaseViewModel: ViewModel() {
 
     // Load
-    val isLoadRequest: LiveData<Boolean>
-        get() = mIsLoadRequest
+    val isShowProgress: LiveData<SingleEvent<Boolean>>
+        get() = setIsShowProgress
 
     // error
-    val responseError: LiveData<String>
-        get() = mResponseError
+    val responseError: LiveData<SingleEvent<String>>
+        get() = setResponseError
 
-    private val mResponseError = MutableLiveData<String>()
-    private val mIsLoadRequest = MutableLiveData<Boolean>()
+    private val setResponseError = MutableLiveData<SingleEvent<String>>()
+    private val setIsShowProgress = MutableLiveData<SingleEvent<Boolean>>()
 
     val handler =  CoroutineExceptionHandler { _ , exception ->
         // error
-        showLoading(false)
-        mResponseError.postValue("${exception.cause}+\n+${exception.message}")
+        showHintMessageResponseError(exception.cause.toString(), exception.message)
 
 //        when(exception){
 //            is SocketException -> mResponseError.postValue(exception.message)
@@ -30,7 +30,14 @@ abstract class BaseViewModel: ViewModel() {
 //        }
     }
 
+    fun showHintMessageResponseError(cause: String?, message: String?) {
+        if (!cause.isNullOrEmpty() && !message.isNullOrEmpty()) {
+            setResponseError.postValue(SingleEvent("${cause}+\n+${message}"))
+        }
+
+    }
+
     fun showLoading(isLoad: Boolean) {
-        mIsLoadRequest.postValue(isLoad)
+        setIsShowProgress.postValue(SingleEvent(isLoad))
     }
 }

@@ -1,6 +1,5 @@
 package com.anna.homeworkandroidinterview.ui.main
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -32,14 +31,12 @@ class MainViewModel(private val imagesRepository: ImagesRepository) : BaseViewMo
 
     // 執行異步操作來獲取圖片
     fun callApiResponseData(keyword: String) {
-        showLoading(true)
         viewModelScope.launch(handler) {
             imagesRepository.searchImage(
                 onStart = { showLoading(true) },
                 onCompletion = { showLoading(false) },
                 keyword
             ).collect {
-                Log.d("TEST", "it.dataList = ${it.dataList.toList()}")
                 if (it.dataList.isEmpty()) {
                     searchNotFound(true)
                 } else {

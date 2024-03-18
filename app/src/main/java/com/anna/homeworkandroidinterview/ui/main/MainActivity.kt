@@ -19,19 +19,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.anna.homeworkandroidinterview.R
 import com.anna.homeworkandroidinterview.core.api.NetworkService
 import com.anna.homeworkandroidinterview.core.repository.ImagesRepositoryImp
-import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
 import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.databinding.ActivityMainBinding
 import com.anna.homeworkandroidinterview.ui.AnyViewModelFactory
+import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
 import com.anna.homeworkandroidinterview.ui.searchSuggest.MySuggestionProvider
+import com.anna.homeworkandroidinterview.util.EventObserver
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val mViewModel by viewModels<MainViewModel> {
-        AnyViewModelFactory{
+        AnyViewModelFactory {
             MainViewModel(ImagesRepositoryImp(NetworkService))
         }
     }
@@ -100,19 +101,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // response Error
-        mViewModel.responseError.observe(this@MainActivity) { errorMessage ->
-            shawDialogMessage(errorMessage)
-        }
 
-        // ProgressBar
-        mViewModel.isLoadRequest.observe(this@MainActivity) { isLoad ->
+        // response Error 一次性
+        mViewModel.responseError.observe(this@MainActivity, EventObserver { errorMessage ->
+            shawDialogMessage(errorMessage)
+        })
+
+        // ProgressBar 一次性
+        mViewModel.isShowProgress.observe(this@MainActivity, EventObserver { isLoad ->
             if (isLoad) {
                 binding.contentLoadingProgressBar.show()
             } else {
                 binding.contentLoadingProgressBar.hide()
             }
-        }
+        })
     }
 
     /**
