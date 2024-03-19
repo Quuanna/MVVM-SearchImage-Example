@@ -1,7 +1,5 @@
 package com.anna.homeworkandroidinterview.core.repository
 
-import com.anna.homeworkandroidinterview.core.api.ApiConfig
-import com.anna.homeworkandroidinterview.core.api.NetworkService
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -11,18 +9,25 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 
 
-class ImagesRepositoryImp(private val networkService: NetworkService.Companion) : ImagesRepository {
+class ImagesRepositoryImpl(
+    private val imageDataRemoteSource: ImageDataSource,
+    private val imageDataLocalSource: ImageDataSource
+    // Local Data
+) : ImagesRepository {
     override fun searchImage(
         onStart: () -> Unit,
         onCompletion: () -> Unit,
+        onError: (String) -> Unit,
         keywords: String
     ): Flow<SearchImageResponseData> = flow {
-        emit(
-            networkService.service.getImages(
-                ApiConfig.API_KEY,
-                ApiConfig.LANGUAGE_CODE,
-                keywords
-            )
-        )
+        imageDataRemoteSource.searchImage(
+            onError = { searchImageLocal(keywords) { onError(it) } }, keywords
+        ).collect {
+            emit(it)
+        }
     }.onStart { onStart() }.onCompletion { onCompletion() }.flowOn(Dispatchers.IO)
+
+    private fun searchImageLocal(keywords: String, onError: (String) -> Unit) {
+        imageDataLocalSource.searchImage(onError = { onError(it) }, keywords = keywords)
+    }
 }

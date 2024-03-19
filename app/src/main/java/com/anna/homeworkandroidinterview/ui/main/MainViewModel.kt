@@ -1,5 +1,6 @@
 package com.anna.homeworkandroidinterview.ui.main
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,7 +10,6 @@ import com.anna.homeworkandroidinterview.ui.BaseViewModel
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val imagesRepository: ImagesRepository) : BaseViewModel() {
-
 
     // response
     val getResponseImagesList: LiveData<SearchImageResponseData>
@@ -31,10 +31,11 @@ class MainViewModel(private val imagesRepository: ImagesRepository) : BaseViewMo
 
     // 執行異步操作來獲取圖片
     fun callApiResponseData(keyword: String) {
-        viewModelScope.launch(handler) {
+        viewModelScope.launch(handlerException) {
             imagesRepository.searchImage(
                 onStart = { showLoading(true) },
                 onCompletion = { showLoading(false) },
+                onError = { showServiceMessageError(it) },
                 keyword
             ).collect {
                 if (it.dataList.isEmpty()) {

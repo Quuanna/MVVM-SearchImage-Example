@@ -16,12 +16,16 @@ abstract class BaseViewModel: ViewModel() {
     val responseError: LiveData<SingleEvent<String>>
         get() = setResponseError
 
+    val serviceError: LiveData<SingleEvent<String>>
+        get() = setResponseError
+
     private val setResponseError = MutableLiveData<SingleEvent<String>>()
+    private val setServiceError = MutableLiveData<SingleEvent<String>>()
     private val setIsShowProgress = MutableLiveData<SingleEvent<Boolean>>()
 
-    val handler =  CoroutineExceptionHandler { _ , exception ->
+    val handlerException =  CoroutineExceptionHandler { _, exception ->
         // error
-        showHintMessageResponseError(exception.cause.toString(), exception.message)
+        showExceptionMessageError(exception.cause.toString(), exception.message)
 
 //        when(exception){
 //            is SocketException -> mResponseError.postValue(exception.message)
@@ -30,11 +34,14 @@ abstract class BaseViewModel: ViewModel() {
 //        }
     }
 
-    fun showHintMessageResponseError(cause: String?, message: String?) {
+    fun showExceptionMessageError(cause: String?, message: String?) {
         if (!cause.isNullOrEmpty() && !message.isNullOrEmpty()) {
             setResponseError.postValue(SingleEvent("${cause}+\n+${message}"))
         }
+    }
 
+    fun showServiceMessageError(msg: String) {
+        setServiceError.postValue(SingleEvent(msg))
     }
 
     fun showLoading(isLoad: Boolean) {

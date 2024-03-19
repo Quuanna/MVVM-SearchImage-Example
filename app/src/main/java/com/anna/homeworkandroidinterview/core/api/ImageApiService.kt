@@ -1,6 +1,7 @@
 package com.anna.homeworkandroidinterview.core.api
 
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -11,5 +12,5 @@ interface ImageApiService {
         @Query("key") apiKey: String,
         @Query("lang") languageCode: String,
         @Query("q") searchContent: String?
-    ): SearchImageResponseData
+    ): Response<SearchImageResponseData>
 }

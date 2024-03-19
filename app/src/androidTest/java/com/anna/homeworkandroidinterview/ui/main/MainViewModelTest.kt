@@ -2,9 +2,7 @@ package com.anna.homeworkandroidinterview.ui.main
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.anna.homeworkandroidinterview.core.api.NetworkService
-import com.anna.homeworkandroidinterview.core.repository.ImagesRepository
-import com.anna.homeworkandroidinterview.core.repository.ImagesRepositoryImp
+import com.anna.homeworkandroidinterview.data.source.FakeImagesRepositoryImpl
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue
@@ -17,14 +15,13 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MainViewModelTest {
-    private lateinit var imagesRepository: ImagesRepository
+    private lateinit var fakeImageRepository: FakeImagesRepositoryImpl
     private lateinit var testViewModel: MainViewModel
-    private val networkService = NetworkService.Companion // TODO Add Mock NetworkService
 
     @Before
     fun initRepository() {
-        imagesRepository = ImagesRepositoryImp(networkService)
-        testViewModel = MainViewModel(imagesRepository) // Given a fresh TasksViewModel
+        fakeImageRepository = FakeImagesRepositoryImpl()
+        testViewModel = MainViewModel(fakeImageRepository) // Given a fresh TasksViewModel
     }
 
     @get:Rule
@@ -53,14 +50,14 @@ class MainViewModelTest {
 
     @Test
     fun showResponseError_singleEvent() {
-        testViewModel.showHintMessageResponseError("SocketException", "exception.message")
+        testViewModel.showExceptionMessageError("SocketException", "exception.message")
         val value = testViewModel.responseError.getOrAwaitValue()
         MatcherAssert.assertThat(value.getContentIfNotHandled(), not(nullValue()))
     }
 
     @Test
     fun singleEventShowResponseError_notNull() {
-        testViewModel.showHintMessageResponseError("SocketException", "exception.message")
+        testViewModel.showExceptionMessageError("SocketException", "exception.message")
         val value = testViewModel.responseError.getOrAwaitValue()
         MatcherAssert.assertThat(value, not(nullValue()))
     }

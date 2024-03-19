@@ -18,7 +18,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anna.homeworkandroidinterview.R
 import com.anna.homeworkandroidinterview.core.api.NetworkService
-import com.anna.homeworkandroidinterview.core.repository.ImagesRepositoryImp
+import com.anna.homeworkandroidinterview.core.repository.ImagesRepositoryImpl
+import com.anna.homeworkandroidinterview.core.repository.source.local.ImagesLocalDataSource
+import com.anna.homeworkandroidinterview.core.repository.source.remote.ImagesRemoteDataSource
 import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.databinding.ActivityMainBinding
@@ -33,7 +35,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mViewModel by viewModels<MainViewModel> {
         AnyViewModelFactory {
-            MainViewModel(ImagesRepositoryImp(NetworkService))
+            MainViewModel(
+                ImagesRepositoryImpl(
+                    ImagesRemoteDataSource(NetworkService),
+                    ImagesLocalDataSource()
+                )
+            )
         }
     }
 
@@ -107,6 +114,11 @@ class MainActivity : AppCompatActivity() {
             shawDialogMessage(errorMessage)
         })
 
+        // service Error 一次性
+        mViewModel.serviceError.observe(this@MainActivity, EventObserver { errorMessage ->
+            shawDialogMessage(errorMessage)
+        })
+
         // ProgressBar 一次性
         mViewModel.isShowProgress.observe(this@MainActivity, EventObserver { isLoad ->
             if (isLoad) {
@@ -132,6 +144,7 @@ class MainActivity : AppCompatActivity() {
                 binding.recyclerView.layoutManager =
                     GridLayoutManager(this, 2, RecyclerView.VERTICAL, false)
             }
+
             CardsType.VERTICAL -> {
                 binding.recyclerView.layoutManager =
                     LinearLayoutManager(this, RecyclerView.VERTICAL, false)
@@ -146,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                 menu.setIcon(R.drawable.ic_baseline_grid_view)
                 switchRecycleViewLayout(mImageViewDataList, CardsType.VERTICAL)
             }
+
             getString(R.string.menu_item_switch_list) -> {
                 menu.title = getString(R.string.menu_item_switch_list)
                 menu.setIcon(R.drawable.ic_baseline_list_view)
@@ -235,6 +249,7 @@ class MainActivity : AppCompatActivity() {
                             menu.setIcon(R.drawable.ic_baseline_list_view)
                             switchRecycleViewLayout(mImageViewDataList, CardsType.GRID)
                         }
+
                         getString(R.string.menu_item_switch_list) -> {
                             menu.title = getString(R.string.menu_item_switch_grid)
                             menu.setIcon(R.drawable.ic_baseline_grid_view)
@@ -243,6 +258,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     true
                 }
+
                 else -> {
                     false // 無需處理流程
                 }
