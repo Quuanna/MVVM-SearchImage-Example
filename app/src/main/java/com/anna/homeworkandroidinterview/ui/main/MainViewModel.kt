@@ -1,8 +1,9 @@
 package com.anna.homeworkandroidinterview.ui.main
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.anna.homeworkandroidinterview.core.repository.ImagesRepository
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
@@ -47,4 +48,13 @@ class MainViewModel(private val imagesRepository: ImagesRepository) : BaseViewMo
         }
     }
 }
+
+@Suppress("UNCHECKED_CAST")
+class TasksViewModelFactory (
+    private val tasksRepository: ImagesRepository
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>) =
+        (MainViewModel(tasksRepository) as T)
+}
+
 
