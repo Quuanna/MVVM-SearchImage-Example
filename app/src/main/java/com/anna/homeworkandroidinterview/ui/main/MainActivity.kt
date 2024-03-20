@@ -16,15 +16,11 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.anna.homeworkandroidinterview.MyApplication
 import com.anna.homeworkandroidinterview.R
-import com.anna.homeworkandroidinterview.core.api.NetworkService
-import com.anna.homeworkandroidinterview.core.repository.ImagesRepositoryImpl
-import com.anna.homeworkandroidinterview.core.repository.source.local.ImagesLocalDataSource
-import com.anna.homeworkandroidinterview.core.repository.source.remote.ImagesRemoteDataSource
 import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.databinding.ActivityMainBinding
-import com.anna.homeworkandroidinterview.ui.AnyViewModelFactory
 import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
 import com.anna.homeworkandroidinterview.ui.searchSuggest.MySuggestionProvider
 import com.anna.homeworkandroidinterview.util.EventObserver
@@ -33,15 +29,9 @@ import com.anna.homeworkandroidinterview.util.EventObserver
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
     private val mViewModel by viewModels<MainViewModel> {
-        AnyViewModelFactory {
-            MainViewModel(
-                ImagesRepositoryImpl(
-                    ImagesRemoteDataSource(NetworkService),
-                    ImagesLocalDataSource()
-                )
-            )
-        }
+        TasksViewModelFactory((application as MyApplication).imagesRepository)
     }
 
     private var mImageViewDataList: List<SearchImageResponseData.Info?> = listOf()
