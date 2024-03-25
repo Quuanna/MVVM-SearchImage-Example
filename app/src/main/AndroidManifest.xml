@@ -25,13 +25,7 @@
                 android:resource="@xml/searchable" />
 
         </activity>
-        <!--使搜索對話框能夠在 SearchableActivity 中啟動搜索 -->
-        <activity android:name=".ui.searchSuggest.QuerySuggestionsActivity">
-            <!-- 搜索對話框以將搜索發送到 SearchableActivity -->
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SearchableActivity" />
-        </activity>
+
 
         <provider
             android:name=".ui.searchSuggest.MySuggestionProvider"
