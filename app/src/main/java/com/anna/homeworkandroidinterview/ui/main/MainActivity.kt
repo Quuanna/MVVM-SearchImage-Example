@@ -6,24 +6,27 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
-import android.provider.SearchRecentSuggestions
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.database.getStringOrNull
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anna.homeworkandroidinterview.MyApplication
+import com.anna.homeworkandroidinterview.OnHistoricalDeleteListener
 import com.anna.homeworkandroidinterview.R
 import com.anna.homeworkandroidinterview.data.element.CardsType
 import com.anna.homeworkandroidinterview.data.model.response.SearchImageResponseData
 import com.anna.homeworkandroidinterview.databinding.ActivityMainBinding
+import com.anna.homeworkandroidinterview.ui.adapter.CustomHistoricalSuggestionsAdapter
 import com.anna.homeworkandroidinterview.ui.adapter.ImageRecycleViewAdapter
-import com.anna.homeworkandroidinterview.ui.searchSuggest.MySuggestionProvider
 import com.anna.homeworkandroidinterview.util.EventObserver
+import com.anna.homeworkandroidinterview.util.HistoricalSuggestionsHelper
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,12 +37,15 @@ class MainActivity : AppCompatActivity() {
         TasksViewModelFactory((application as MyApplication).imagesRepository)
     }
 
+    private val historicalSuggestionsHelper by lazy { HistoricalSuggestionsHelper.initContext(this) }
+
     private var mImageViewDataList: List<SearchImageResponseData.Info?> = listOf()
 
     private var mSearchView: SearchView? = null
     private val mMenuItemClick = OnMenuItemClick()
     private val mQueryTextListener = OnQueryTextListener()
     private val mSuggestionListener = OnSuggestionListener()
+    private lateinit var customSuggestionsAdapter: CustomHistoricalSuggestionsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,9 +66,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.options_menu, menu)
         val searchItem = menu.findItem(R.id.menu_search)
-        mSearchView = searchItem.actionView as SearchView
+        mSearchView = searchItem.actionView as? SearchView
 
-        clearSearchHistory()
         //將可搜尋配置與SearchView關聯
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         mSearchView?.apply {
@@ -73,9 +78,28 @@ class MainActivity : AppCompatActivity() {
             // 監聽歷史紀錄搜尋
             setOnSuggestionListener(mSuggestionListener)
             isSubmitButtonEnabled = true
+            // 客製Adapter View
+            configureSearchMenu(this)
         }
+
         return true
     }
+
+    private fun configureSearchMenu(searchView: SearchView) {
+        searchView.run {
+            setIconifiedByDefault(true)
+            customSuggestionsAdapter = CustomHistoricalSuggestionsAdapter(this@MainActivity)
+            suggestionsAdapter = customSuggestionsAdapter
+            customSuggestionsAdapter.addOnHistoricalDeleteListener(object : OnHistoricalDeleteListener {
+                override fun itemClick(id: String?, query: String?, cursor: Cursor) {
+                    if (!id.isNullOrEmpty() && !query.isNullOrEmpty()) {
+                        historicalSuggestionsHelper.deleteSuggestions(id)
+                    }
+                }
+            })
+        }
+    }
+
 
     private fun initTopAppBar() {
         binding.topAppBar.setOnMenuItemClickListener(mMenuItemClick)
@@ -167,20 +191,11 @@ class MainActivity : AppCompatActivity() {
         //Get Intent，驗證操作並獲取查詢
         if (Intent.ACTION_SEARCH == intent.action) {
             intent.getStringExtra(SearchManager.QUERY)?.also { query ->
-                doSearchSave(query)
+                historicalSuggestionsHelper.doSearchSave(query)
             }
         }
     }
 
-    private fun doSearchSave(query: String) {
-        SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
-            .saveRecentQuery(query, null) // 參數1是搜尋查詢字串、參數2有啟用兩行模式時使用，相反則帶入null
-    }
-
-    private fun clearSearchHistory() {
-        SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE)
-            .clearHistory()
-    }
 
     /**
      *  訊息視窗
@@ -198,8 +213,6 @@ class MainActivity : AppCompatActivity() {
     /**
      * inner class
      * OnQueryTextListener - 輸入搜尋文字監聽的接口
-     * OnSuggestionListener - 點擊歷史紀錄搜尋文字監聽的接口
-     * OnMenuItemClickListener - menu單項單擊事件的接口
      */
     private inner class OnQueryTextListener : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
@@ -209,10 +222,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
+            val cursor = historicalSuggestionsHelper.getRecentSuggestions(newText)
+            mSearchView?.suggestionsAdapter?.swapCursor(cursor)
             return true
         }
     }
 
+    /**
+     *  OnSuggestionListener - 點擊歷史紀錄搜尋文字監聽的接口
+     */
     private inner class OnSuggestionListener : SearchView.OnSuggestionListener {
         override fun onSuggestionSelect(position: Int): Boolean {
             return false
@@ -220,14 +238,16 @@ class MainActivity : AppCompatActivity() {
 
         @SuppressLint("Range")
         override fun onSuggestionClick(position: Int): Boolean {
-            val cursor = mSearchView?.suggestionsAdapter?.getItem(position) as Cursor
-            val selection =
-                cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
-            mSearchView?.setQuery(selection, false)
+            val cursor = mSearchView?.suggestionsAdapter?.getItem(position) as? Cursor
+            val selection = cursor?.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
+            mSearchView?.setQuery(selection, true)
             return true
         }
     }
 
+    /**
+     * OnMenuItemClickListener - menu單項單擊事件的接口
+     */
     private inner class OnMenuItemClick :
         androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {
         override fun onMenuItemClick(menu: MenuItem?): Boolean {

@@ -56,14 +56,14 @@ class MainViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule() // 同步切到背景執行
 
     @Test
-    fun callApiResponseData_notNullValue() {
+    fun 打API後確認有資料() {
         testViewModel.callApiResponseData("貓咪")
         val value = testViewModel.getResponseImagesList.getOrAwaitValue()
         MatcherAssert.assertThat(value, not(nullValue()))
     }
 
     @Test
-    fun callApiResponseData_nullValue() {
+    fun 打API後沒有資料() {
         fakeImageRepository = FakeImagesRepositoryImpl(arrayListOf())
         testViewModel = MainViewModel(fakeImageRepository) // Given a fresh TasksViewModel
 
@@ -73,42 +73,42 @@ class MainViewModelTest {
     }
 
     @Test
-    fun searchNotFound_true() {
+    fun 搜尋未找到_true() {
         testViewModel.searchNotFound(true)  // When adding a new task
         val value = testViewModel.isSearchNotFound.getOrAwaitValue()
         MatcherAssert.assertThat(value, `is`(true))
     }
 
     @Test
-    fun searchNotFound_false() {
+    fun 搜尋未找到_false() {
         testViewModel.searchNotFound(false)  // When adding a new task
         val value = testViewModel.isSearchNotFound.getOrAwaitValue()
         MatcherAssert.assertThat(value, `is`(false))
     }
 
     @Test
-    fun showResponseError_singleEvent() {
+    fun API回應錯誤_顯示單一事件視窗邏輯是否正確() {
         testViewModel.showExceptionMessageError("SocketException", "exception.message")
         val value = testViewModel.responseError.getOrAwaitValue()
         MatcherAssert.assertThat(value.getContentIfNotHandled(), not(nullValue()))
     }
 
     @Test
-    fun singleEventShowResponseError_notNull() {
+    fun 顯示API回應錯誤不為空() {
         testViewModel.showExceptionMessageError("SocketException", "exception.message")
         val value = testViewModel.responseError.getOrAwaitValue()
         MatcherAssert.assertThat(value, not(nullValue()))
     }
 
     @Test
-    fun showProgress_singleEvent() {
+    fun 畫面進度_顯示單一事件的邏輯是否正確() {
         testViewModel.showLoading(true)
         val value = testViewModel.isShowProgress.getOrAwaitValue()
         MatcherAssert.assertThat(value.getContentIfNotHandled(), not(nullValue()))
     }
 
     @Test
-    fun singleEventShowProgress_true() {
+    fun 單一事件顯示進度_true() {
         testViewModel.showLoading(true)
         val event = testViewModel.isShowProgress.getOrAwaitValue()
         event.getContentIfNotHandled()?.let { value ->
@@ -118,7 +118,7 @@ class MainViewModelTest {
 
 
     @Test
-    fun singleEventShowProgress_false() {
+    fun 單一事件顯示進度_false() {
         testViewModel.showLoading(false)
         val event = testViewModel.isShowProgress.getOrAwaitValue()
         event.getContentIfNotHandled()?.let { value ->

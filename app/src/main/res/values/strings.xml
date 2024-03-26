@@ -3,6 +3,7 @@
 
     <string name="page_title">頁面</string>
     <string name="menu_item_search">搜尋</string>
+    <string name="menu_item_clear_search">清除搜尋紀錄</string>
     <string name="menu_item_switch_grid">網格呈現</string>
     <string name="menu_item_switch_list">列表呈現</string>
 
