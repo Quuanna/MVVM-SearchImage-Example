@@ -1,6 +1,3 @@
-
-![螢幕擷取畫面 2024-03-20 150312](https://github.com/Quuanna/SearchImage/assets/36694083/8a909a99-5d7b-4685-88e4-23201032a20d)
-
 # Architecture
    - MVVM Architecture (Model - View - ViewModel)
    - Repository Pattern
