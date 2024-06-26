@@ -8,8 +8,8 @@
    - Lifecycle: Observe Android lifecycles and handle UI states upon the lifecycle changes.
    - ViewModel: Manages UI-related data holder and lifecycle aware. Allows data to survive configuration changes such as screen rotations.
    - [LiveData](https://developer.android.com/topic/libraries/architecture/livedata): observable data holder class and lifecycle-aware, only update app Component observers that are in an active lifecycle state.
-# Construct the REST APIs And network data
-  - Retrofit、OKhttp
+# Network
+  - Retrofit、OKhttp :　Construct the REST APIs And network data
 # Unit Test 
   - local unit tests
   - JVM testing
