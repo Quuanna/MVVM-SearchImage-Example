@@ -9,7 +9,6 @@
   - Retrofit、OKhttp :　Construct the REST APIs And network data
 # Unit Test 
   - local unit tests
-  - JVM testing
   - Instrumented testing
   - coroutine test
 
